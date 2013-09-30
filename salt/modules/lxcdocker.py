@@ -333,9 +333,18 @@ def get_container_infos(container):
 
 def logs(container):
     '''
-    Get container logs
-    container
-        container id
+    Get the log output from a container
+
+    :type container: string
+    :param container: The container id to get the logs from
+
+    :rtype: dict
+    :returns: A status message with the log output
+
+    .. code-block:: bash
+
+        salt '*' docker.logs <container>
+
     '''
     status = base_status.copy()
     client = get_client()
@@ -562,6 +571,10 @@ def stop(container, timeout=10):
             {'id': 'abcdef123456789',
            'status': True}
 
+    .. code-block:: bash
+
+        salt '*' docker.stop <container> [timeout]
+
     '''
     client = get_client()
     status = base_status.copy()
@@ -603,6 +616,10 @@ def kill(container):
           ex:
             {'id': 'abcdef123456789',
            'status': True}
+
+    .. code-block:: bash
+
+        salt '*' docker.kill <container>
 
     '''
     client = get_client()
@@ -654,6 +671,10 @@ def restart(container, timeout=10):
             {'id': 'abcdef123456789',
            'status': True}
 
+    .. code-block:: bash
+
+        salt '*' docker.restart <container>
+
     '''
     client = get_client()
     status = base_status.copy()
@@ -676,12 +697,19 @@ def restart(container, timeout=10):
 
 def start(container, binds=None, ports=None):
     '''
-    restart the specified container
-    container
-        Container id
-    Returns the status mapping as usual
-         {'id': id of the container,
-          'status': True if started }
+    Restart a stopped container
+
+    :type container: string
+    :param container: The container id to restart
+
+    :type binds: dict
+    :param binds: The volumes to bind to the container
+
+    :rtype: dict
+    :returns: A status message with the command output
+         ex:
+             {'id': id of the container,
+              'status': True}
     '''
     if not binds:
         binds = {}
@@ -1035,8 +1063,11 @@ def tag(image, repository, tag=None, force=False):
     :type force: boolean
     :param force: Forces application of the tag
 
+    :rtype: dict
+    :returns: A status message with the command output
+
     .. code-block:: bash
-    
+
         salt '*' docker.tag <image> <repository> [tag] [force=(True|False)]
 
     '''
@@ -1080,7 +1111,7 @@ def get_images(name=None, quiet=False, all=True):
     :returns: A status message with the command output
 
     .. code-block:: bash
-    
+
         salt '*' docker.get_images [name] [quiet=(True|False)] [all=(True|False)
 
     '''
@@ -1141,7 +1172,7 @@ def build(path=None,
 def remove_image(image):
     '''
     Remove an image from a system.
-    
+
     :type image: string
     :param image: The image to remove
 
