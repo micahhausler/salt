@@ -100,10 +100,7 @@ You have those methods:
     - logs
     - diff
     - commit
-
-    TODO:
     - create_container
-    - create_container_from_config
     - export
 
 Runtime execution within a specific container
@@ -129,7 +126,6 @@ import json
 import os
 import traceback
 
-import salt.utils
 from salt.exceptions import CommandExecutionError
 
 try:
@@ -250,7 +246,7 @@ def merge_auth_bits():
     return config
 
 
-def get_containers(all=True, trunc=False):
+def get_containers(all=True, trunc=False, since=None, before=None, limit=-1):
     '''
     Get a list of mappings representing all containers
 
@@ -265,7 +261,11 @@ def get_containers(all=True, trunc=False):
     '''
     client = get_client()
     status = base_status.copy()
-    ret = client.containers(all=all, trunc=trunc)
+    ret = client.containers(all=all,
+                            trunc=trunc,
+                            since=since,
+                            before=before,
+                            limit=limit)
     if ret:
         valid(status, comment='All containers in out', out=ret)
     else:
@@ -416,6 +416,39 @@ def diff(container):
     return status
 
 
+def export(container, path):
+    '''
+    Export a container to a file
+    container
+        container id
+    path
+        path to the export
+    '''
+
+    try:
+        ppath = os.path.abspath(path)
+        fic = open(ppath, 'w')
+        status = base_status.copy()
+        client = get_client()
+        response = client.export(get_container_infos(container)['id'])
+        try:
+            byte = response.read(4096)
+            fic.write(byte)
+            while byte != "":
+                # Do stuff with byte.
+                byte = response.read(4096)
+                fic.write(byte)
+        finally:
+            fic.flush()
+            fic.close()
+        valid(status,
+              id=container, out=ppath,
+              comment='Exported to {0}'.format(ppath))
+    except Exception:
+        invalid(status, id=container, out=traceback.format_exc())
+    return status
+
+
 def create_container(image,
                      command='/sbin/init',
                      hostname=None,
@@ -450,7 +483,8 @@ def create_container(image,
     volumes
         list of volumes mapping::
 
-            ({'/mountpoint/contained/foo:/host/foo'})
+            (['/mountpoint/in/container:/guest/foo',
+              '/same/path/mounted/point'])
 
     tty
         attach ttys
@@ -458,10 +492,29 @@ def create_container(image,
         let stdin open
     volumes_from
         container to get volumes definition from
+
+    EG:
+
+        salt-call lxcdocker.create_container o/ubuntu volumes="['/s','/m:/f']"
+
     '''
     status = base_status.copy()
     client = get_client()
     try:
+        mountpoints = {}
+        binds = {}
+        # create empty mountpoints for them to be
+        # editable
+        # either we have a list of guest or host:guest
+        if isinstance(volumes, list):
+            for mountpoint in volumes:
+                mounted = mountpoint
+                if ':' in mountpoint:
+                    parts = mountpoint.split(':')
+                    mountpoint = parts[1]
+                    mounted = parts[0]
+                mountpoints[mountpoint] = {}
+                binds[mounted] = mountpoint
         info = client.create_container(
             image=image,
             command=command,
@@ -474,10 +527,12 @@ def create_container(image,
             ports=ports,
             environment=environment,
             dns=dns,
-            volumes=volumes,
+            volumes=mountpoints,
             volumes_from=volumes_from,
         )
         container = info['Id']
+        kill(container)
+        start(container, binds=binds)
         valid(status,
               id=container,
               comment='Container created',
@@ -900,12 +955,6 @@ def top(container):
     return status
 
 
-def export(container):
-    client = get_client()
-    dcontainer = get_container_infos(container)['id']
-    return client.export(dcontainer)
-
-
 def inspect_container(container):
     '''
     Get container information. This is similar to the docker inspect command.
@@ -1112,7 +1161,7 @@ def get_images(name=None, quiet=False, all=True):
 
     .. code-block:: bash
 
-        salt '*' docker.get_images [name] [quiet=(True|False)] [all=(True|False)
+        salt '*' docker.get_images [name] [quiet=True|False] [all=True|False]
 
     '''
     client = get_client()
@@ -1176,8 +1225,8 @@ def remove_image(image):
     :type image: string
     :param image: The image to remove
 
-    :rtype: string
-    :returns: A status message.
+    :rtype: dict
+    :returns: A status message with the command output
 
     .. code-block:: bash
 
@@ -1358,7 +1407,7 @@ def pull(repo, tag=None):
                 True
 
     .. code-block:: bash
-        
+
         salt '*' docker.pull <repository> [tag]
 
     '''
