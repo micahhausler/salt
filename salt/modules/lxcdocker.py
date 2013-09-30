@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-Managment of dockers: overview of this module
-=============================================
+Managment of Docker containers and images: overview of this module
+==================================================================
 
-installation prerequsuites
-------------------------------
+Installation Prerequsuites
+--------------------------
 - You will need the 'docker-py' python package in your python installation
   running salt.
 - For now, you need this fork: https://github.com/kiorky/docker-py
