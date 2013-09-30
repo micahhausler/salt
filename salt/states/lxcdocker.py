@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 '''
-Managment of dockers
-=====================
+Managment of Docker images and containers
+=========================================
 
 Available Functions
 -------------------
@@ -11,7 +11,7 @@ Available Functions
 .. code-block:: yaml
 
     corp/mysuperdocker_img:
-        lxcdocker.build:
+        lxcdocker.built:
             - path: /path/to/dir/container/Dockerfile
 
 - pulled
