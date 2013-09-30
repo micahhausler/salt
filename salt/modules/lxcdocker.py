@@ -156,7 +156,7 @@ base_status = {
 
 def __virtual__():
     if HAS_DOCKER:
-        return 'docker'
+        return 'lxcdocker'
 
 
 def sizeof_fmt(num):
@@ -343,7 +343,7 @@ def logs(container):
 
     .. code-block:: bash
 
-        salt '*' docker.logs <container>
+        salt '*' lxcdocker.logs <container>
 
     '''
     status = base_status.copy()
@@ -551,7 +551,7 @@ def version():
 
     .. code-block:: bash
 
-        salt '*' docker.version
+        salt '*' lxcdocker.version
     '''
     status = base_status.copy()
     client = get_client()
@@ -572,7 +572,7 @@ def info():
 
     .. code-block:: bash
 
-        salt '*' docker.info
+        salt '*' lxcdocker.info
 
     '''
     status = base_status.copy()
@@ -628,7 +628,7 @@ def stop(container, timeout=10):
 
     .. code-block:: bash
 
-        salt '*' docker.stop <container> [timeout]
+        salt '*' lxcdocker.stop <container> [timeout]
 
     '''
     client = get_client()
@@ -674,7 +674,7 @@ def kill(container):
 
     .. code-block:: bash
 
-        salt '*' docker.kill <container>
+        salt '*' lxcdocker.kill <container>
 
     '''
     client = get_client()
@@ -728,7 +728,7 @@ def restart(container, timeout=10):
 
     .. code-block:: bash
 
-        salt '*' docker.restart <container>
+        salt '*' lxcdocker.restart <container>
 
     '''
     client = get_client()
@@ -843,7 +843,7 @@ def exists(container):
 
     .. code-block:: bash
 
-        salt '*' docker.exists <container>
+        salt '*' lxcdocker.exists <container>
 
     '''
     try:
@@ -967,7 +967,7 @@ def inspect_container(container):
 
     .. code-block:: bash
 
-        salt '*' docker.inspect_container <container>
+        salt '*' lxcdocker.inspect_container <container>
 
     '''
     status = base_status.copy()
@@ -1000,7 +1000,7 @@ def search(term):
 
     .. code-block:: bash
 
-        salt '*' docker.search <term>
+        salt '*' lxcdocker.search <term>
 
     '''
     client = get_client()
@@ -1073,7 +1073,7 @@ def import_image(src, repo, tag=None):
 
     .. code-block:: bash
 
-        salt '*' docker.import_image <src> <repo> [tag]
+        salt '*' lxcdocker.import_image <src> <repo> [tag]
 
     '''
     client = get_client()
@@ -1117,7 +1117,7 @@ def tag(image, repository, tag=None, force=False):
 
     .. code-block:: bash
 
-        salt '*' docker.tag <image> <repository> [tag] [force=(True|False)]
+        salt '*' lxcdocker.tag <image> <repository> [tag] [force=(True|False)]
 
     '''
     client = get_client()
@@ -1161,7 +1161,7 @@ def get_images(name=None, quiet=False, all=True):
 
     .. code-block:: bash
 
-        salt '*' docker.get_images [name] [quiet=True|False] [all=True|False]
+        salt '*' lxcdocker.get_images [name] [quiet=True|False] [all=True|False]
 
     '''
     client = get_client()
@@ -1230,7 +1230,7 @@ def remove_image(image):
 
     .. code-block:: bash
 
-        salt '*' docker.remove_image <image>
+        salt '*' lxcdocker.remove_image <image>
 
     '''
     client = get_client()
@@ -1408,7 +1408,7 @@ def pull(repo, tag=None):
 
     .. code-block:: bash
 
-        salt '*' docker.pull <repository> [tag]
+        salt '*' lxcdocker.pull <repository> [tag]
 
     '''
     client = get_client()
